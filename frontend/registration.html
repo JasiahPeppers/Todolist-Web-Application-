@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+    <form id="registerForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <button type="button" onclick="register()">Register</button>
+        <p>Already have an account? <a href="https://todolistusers.wuaze.com">Login</a>
+    </form>
+
+    <div id="message"></div>
+
+    <script>
+        function register() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const messageDiv = document.getElementById("message");
+
+            fetch('https://todolistusers.onrender.com/register', { // Your Flask register endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: username, password: password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                messageDiv.textContent = data.message;
+                if(data.ok){
+                    messageDiv.style.color = "green";
+                    window.location.href = "/index.html"
+                } else {
+                    messageDiv.style.color = "red";
+                }
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                messageDiv.textContent = 'An error occurred during registration.';
+                messageDiv.style.color = "red";
+            });
+        }
+    </script>
+</body>
+</html>
