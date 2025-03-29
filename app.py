@@ -8,13 +8,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 CORS(app)
 
-# Set a secret key for session management
-app.secret_key = os.environ.get('SECRET_KEY', 'your_default_secret_key')  # Change to a real secret in production
+# Set a secret key for session management (using the one you generated)
+app.secret_key = os.environ.get('SECRET_KEY', '78f781ecfb73f94c3494ff80d85cca53c4e6967376d89cad')  # Replace with your actual secret key in production
 
-# Check if the DATABASE_URL environment variable exists for Render deployment
-db_url = os.environ.get('DATABASE_URL', 'sqlite:///tasks.db')  # Default to SQLite for local testing
+# PostgreSQL URL for your Render database
+db_url = os.environ.get('DATABASE_URL', 'postgresql://task_b30z_user:YSEO8sT6RBjDLCClvedFcjhSB1htk2e8@dpg-cvjolq0gjchc73d6bkeg-a/task_b30z')
 
-# Setting up the database URI (SQLite locally or PostgreSQL in production)
+# Setting up the database URI (PostgreSQL in production, SQLite for local testing)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
