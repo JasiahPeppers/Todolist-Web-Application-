@@ -12,7 +12,7 @@ CORS(app)
 app.secret_key = os.environ.get('SECRET_KEY', '78f781ecfb73f94c3494ff80d85cca53c4e6967376d89cad')  # Replace with your actual secret key in production
 
 # PostgreSQL URL for your Render database
-db_url = os.environ.get('DATABASE_URL', 'postgresql://task_b30z_user:YSEO8sT6RBjDLCClvedFcjhSB1htk2e8@dpg-cvjolq0gjchc73d6bkeg-a/task_b30z')
+db_url = os.environ.get('DATABASE_URL', 'postgresql://task_b30z_user:YSEO8sT6RBjDLCClvedFcjhSB1htk2e8@dpg-cvjolq0gjchc73d6bkeg-a.oregon-postgres.render.com/task_b30z')
 
 # Setting up the database URI (PostgreSQL in production, SQLite for local testing)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
@@ -186,4 +186,4 @@ def task(id):
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
