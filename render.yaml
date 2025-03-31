@@ -3,5 +3,5 @@ services:
     name: flask-app
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn backend.app:app"  # Use backend.app:app instead of app:app
+    startCommand: "gunicorn backend.app:app"  # Adjust this if your app is located elsewhere
     plan: free
