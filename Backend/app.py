@@ -6,7 +6,7 @@ from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://todolistapp.infy.uk"])  # Allow the frontend domain
 
 # Set a secret key for session management (using the one you generated)
 app.secret_key = os.environ.get('SECRET_KEY', '78f781ecfb73f94c3494ff80d85cca53c4e6967376d89cad')  # Replace with your actual secret key in production
