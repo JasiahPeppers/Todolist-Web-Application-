@@ -4,7 +4,10 @@ import logging
 from flask_cors import CORS
 from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
-
+# This is for the password complexity 
+password_regex = (
+    r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+)
 app = Flask(__name__)
 # CORS Configuration
 # Allow requests from the specific frontend domain
@@ -26,13 +29,13 @@ db.init_app(app)
 
 from models import User, Task
 
-# need logging?
+# More Logging 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 with app.app_context():
     db.create_all()
 
-# Test DB route (optional)
+# Test DB route
 @app.route('/test_db', methods=['GET'])
 def test_db():
     try:
@@ -42,7 +45,7 @@ def test_db():
         logging.error(f"Database connection error: {e}")
         return jsonify({'message': 'Database connection failed'}), 500
 
-# Registration route (no change)
+# Registration route 
 @app.route('/register', methods=['POST'])
 def register():
     try:
@@ -53,7 +56,11 @@ def register():
 
         username = data['username']
         password = data['password']
-
+# This is the password complexity check :)
+        if not re.match(password_regex, password):
+            logging.warning(f"Password does not meet complexity requirements for username '{username}'")
+            return jsonify({'message': 'Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character.'}), 400
+            
         if User.query.filter_by(username=username).first():
             logging.warning(f"Username '{username}' already exists")
             return jsonify({'message': 'Username already exists'}), 400
