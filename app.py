@@ -4,6 +4,7 @@ import logging
 from flask_cors import CORS
 from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
+import re
 # This is for the password complexity 
 password_regex = (
     r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
