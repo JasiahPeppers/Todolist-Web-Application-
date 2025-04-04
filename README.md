@@ -1,4 +1,4 @@
-# To-Do List Web app Project | Next Milestone 
+# To-Do List Web app Project | Documentation 
 ## Project desc: 
 A web-based To-Do List application allowing users to effectivley manage and track tasks in a friendly user enviornment. 
 ## Jasiah Peppers (Frontend Development): 
