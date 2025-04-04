@@ -5,9 +5,6 @@ from flask_cors import CORS
 from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# This is the password complexity requirements
-password_regex = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
-
 app = Flask(__name__)
 # CORS Configuration
 # Allow requests from the specific frontend domain
@@ -56,10 +53,6 @@ def register():
 
         username = data['username']
         password = data['password']
-        
-    if not re.match(password_regex, password):
-    logging.warning(f"Password does not meet complexity requirements for username '{username}'")
-    return jsonify({'message': 'Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character.'}), 400
 
         if User.query.filter_by(username=username).first():
             logging.warning(f"Username '{username}' already exists")
