@@ -14,7 +14,7 @@ CORS(app, origins=["https://todolistapp.infy.uk"])  # Allow the frontend domain 
 app.secret_key = os.environ.get('SECRET_KEY', '78f781ecfb73f94c3494ff80d85cca53c4e6967376d89cad')  # Replace with your actual secret key in production
 
 # PostgreSQL URL for your Render database
-db_url = os.environ.get('DATABASE_URL', 'postgresql://task_b30z_user:YSEO8sT6RBjDLCClvedFcjhSB1htk2e8@dpg-cvjolq0gjchc73d6bkeg-a.oregon-postgres.render.com/task_b30z')
+db_url = os.environ.get('DATABASE_URL', 'postgresql://backend_db_flask_user_vmia_user:pVpy47XSEhOaro9AinYSzphKMumM8Aug@dpg-cve54nan91rc73bedsu0-a.oregon-postgres.render.com/backend_db_flask_user_vmia')
 print("Database URL:", db_url)  # This will print the database URL to verify it's correct
 
 # Setting up the database URI (PostgreSQL in production, SQLite for local testing)
