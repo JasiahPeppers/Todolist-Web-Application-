@@ -6,9 +6,8 @@ from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
 import re 
 
-if not re.match(password_regex, password):
-logging.warning(f"Password does not meet complexity requirements for username '{username}'")
-return jsonify({'message': 'Password must be at least 8 characters long, use an uppercase and lowercase letter, a number, and a special character this prevents hackers.'}), 400
+# This is the password complexity requirements 
+password_regex = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
 
 app = Flask(__name__)
 # CORS Configuration
