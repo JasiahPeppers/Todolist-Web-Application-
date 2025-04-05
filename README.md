@@ -27,7 +27,8 @@ A web-based To-Do List application allowing users to effectivley manage and trac
 ## Successful Tests
  - Tested and fixed SSL secuirty errors
  - Tested user authentication data successfully saved to backend
- - Tested logn/regristration redirection
+ - Tested login/regristration redirection
+ - Tested Render communicating to backend files
    
 ## Samantha Treasure (Video editing/presentation) 
  - Creating video presentations, improve editing, transitions, visuals, effects, captions 
