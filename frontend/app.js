@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 description: descValue,
                 task_date: today.toISOString().split('T')[0],
                 priority: 'low' // Default priority
+                user_id: 4 // Make sure this is dynamically set for the correct user
             };
 
             fetch('https://todolistusers.onrender.com/tasks', {
