@@ -2,146 +2,105 @@ from flask import Flask, request, jsonify, session, abort
 import os
 import logging
 from flask_cors import CORS
-from extensions import db
+from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+# CORS Configuration
+# Allow requests from the specific frontend domain
+CORS(app, origins=["https://todolistapp.infy.uk"])  # Allow the frontend domain  # Allow the frontend domain
 
-# Configure CORS (Allow all origins temporarily for debugging)
-CORS(app, supports_credentials=True, origins=["*"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
+# Set a secret key for session management (using the one you generated)
+app.secret_key = os.environ.get('SECRET_KEY', 'b07d3858c42f80893b1176555d8cb7b1b96c03949018bc724eca0afc9ce7456c')  # Replace with your actual secret key in production
 
-# Secret key for session management
-app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
+# PostgreSQL URL for your Render database
+db_url = os.environ.get('DATABASE_URL', 'postgresql://backend_db_flask_user_vmia_user:pVpy47XSEhOaro9AinYSzphKMumM8Aug@dpg-cve54nan91rc73bedsu0-a.oregon-postgres.render.com/backend_db_flask_user_vmia')
+print("Database URL:", db_url)  # This will print the database URL to verify it's correct
 
-# Database Configuration
-db_url = os.environ.get('DATABASE_URL', 'postgresql://backend_db_flask_user_vmia_user:pVpy47XSEhOaro9AinYSzphKMumM8Aug@dpg-cve54nan91rc73bedsu0-a/backend_db_flask_user_vmia')
+# Setting up the database URI (PostgreSQL in production, SQLite for local testing)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize Database
+# Initialize the database with the app
 db.init_app(app)
 
-# Import Models
 from models import User, Task
 
-# Enable Logging
+# More Logging 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Create tables within the application context
 with app.app_context():
     db.create_all()
 
+# Test DB route
 @app.route('/test_db', methods=['GET'])
 def test_db():
-    """Check database connection."""
     try:
         user_count = User.query.count()
-        return jsonify({'message': f'Database connected, {user_count} users found.'}), 200
+        return jsonify({'message': f'Database is connected, {user_count} users found.'}), 200
     except Exception as e:
         logging.error(f"Database connection error: {e}")
         return jsonify({'message': 'Database connection failed'}), 500
 
-@app.route('/tasks', methods=['POST'])
-def add_task():
-    """Add a new task."""
+# Registration route 
+@app.route('/register', methods=['POST'])
+def register():
     try:
         data = request.get_json()
-        logging.info(f"Received Task Data: {data}")
+        if not data or 'username' not in data or 'password' not in data:
+            logging.error("Invalid request")
+            return jsonify({'message': 'Invalid request data'}), 400
 
-        # Validate request data
-        if not data or 'task' not in data or 'user_id' not in data:
-            logging.warning("Invalid task data received")
-            return jsonify({'error': 'Invalid request data'}), 400
+        username = data['username']
+        password = data['password']
 
-        # Ensure user exists
-        user = User.query.get(data['user_id'])
-        if not user:
-            logging.warning(f"User with ID {data['user_id']} not found")
-            return jsonify({'error': 'User not found'}), 404
+        if User.query.filter_by(username=username).first():
+            logging.warning(f"Username '{username}' already exists")
+            return jsonify({'message': 'Username already exists'}), 400
 
-        # Create the new task
-        new_task = Task(
-            task=data['task'],
-            description=data.get('description', ''),
-            priority=data.get('priority', 'low'),
-            status=data.get('status', True),
-            task_date=data.get('task_date', ''),
-            user_id=data['user_id']
-        )
-
-        db.session.add(new_task)
+        new_user = User(username=username)
+        new_user.set_password(password)
+        db.session.add(new_user)
         db.session.commit()
 
-        logging.info(f"Task '{new_task.task}' added successfully for User {data['user_id']}")
-        return jsonify({'message': 'Task added successfully', 'task_id': new_task.id}), 201
+        logging.info(f"User '{username}' registered successfully")
+        return jsonify({'message': 'User registered successfully'}), 201
 
     except Exception as e:
-        logging.error(f"Error adding task: {e}")
+        logging.error(f"Error during registration: {e}")
         db.session.rollback()
-        return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
+        return jsonify({'message': 'Internal server error'}), 500
 
-@app.route('/tasks', methods=['GET'])
-def get_tasks():
-    """Retrieve all tasks."""
+# Login route (with added logging)
+@app.route('/login', methods=['POST'])
+def login():
     try:
-        tasks = Task.query.all()
-        task_list = [{
-            'id': t.id,
-            'task': t.task,
-            'description': t.description,
-            'priority': t.priority,
-            'status': t.status,
-            'task_date': t.task_date,
-            'user_id': t.user_id
-        } for t in tasks]
-
-        return jsonify(task_list), 200
-    except Exception as e:
-        logging.error(f"Error fetching tasks: {e}")
-        return jsonify({'error': 'Internal Server Error'}), 500
-
-@app.route('/tasks/<int:task_id>', methods=['PUT'])
-def update_task(task_id):
-    """Update a task."""
-    try:
-        task = Task.query.get(task_id)
-        if not task:
-            logging.warning(f"Task {task_id} not found")
-            return jsonify({'error': 'Task not found'}), 404
-
         data = request.get_json()
-        task.task = data.get('task', task.task)
-        task.description = data.get('description', task.description)
-        task.priority = data.get('priority', task.priority)
-        task.status = data.get('status', task.status)
+        if not data or 'username' not in data or 'password' not in data:
+            logging.error("Invalid login")
+            return jsonify({'message': 'Invalid request data'}), 400
 
-        db.session.commit()
+        username = data['username']
+        password = data['password']
 
-        logging.info(f"Task {task_id} updated successfully")
-        return jsonify({'message': 'Task updated successfully'}), 200
+        user = User.query.filter_by(username=username).first()
 
+        if user:
+            logging.info(f"User '{username}' found, checking password...")
+            if user.check_password(password):
+                session['username'] = username
+                logging.info(f"User '{username}' logged in successfully")
+                return jsonify({'message': 'Logged in successfully'}), 200
+            else:
+                logging.warning(f"Incorrect password for '{username}'")
+                return jsonify({'message': 'Invalid username or password'}), 401
+        else:
+            logging.warning(f"User '{username}' not found")
+            return jsonify({'message': 'Invalid username or password'}), 401
     except Exception as e:
-        logging.error(f"Error updating task {task_id}: {e}")
-        return jsonify({'error': 'Internal Server Error'}), 500
+        logging.error(f"Error during login: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
 
-@app.route('/tasks/<int:task_id>', methods=['DELETE'])
-def delete_task(task_id):
-    """Delete a task."""
-    try:
-        task = Task.query.get(task_id)
-        if not task:
-            logging.warning(f"Task {task_id} not found")
-            return jsonify({'error': 'Task not found'}), 404
-
-        db.session.delete(task)
-        db.session.commit()
-
-        logging.info(f"Task {task_id} deleted successfully")
-        return jsonify({'message': 'Task deleted successfully'}), 200
-
-    except Exception as e:
-        logging.error(f"Error deleting task {task_id}: {e}")
-        return jsonify({'error': 'Internal Server Error'}), 500
-
+# Run the app with debug enabled
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
