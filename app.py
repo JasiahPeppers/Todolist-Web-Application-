@@ -14,7 +14,7 @@ CORS(app, origins=["https://todolistapp.infy.uk"])  # Allow the frontend domain 
 app.secret_key = os.environ.get('SECRET_KEY', 'b07d3858c42f80893b1176555d8cb7b1b96c03949018bc724eca0afc9ce7456c')  # Replace with your actual secret key in production
 
 # PostgreSQL URL for your Render database
-db_url = os.environ.get('DATABASE_URL', 'postgresql://backend_db_flask_user_vmia_user:pVpy47XSEhOaro9AinYSzphKMumM8Aug@dpg-cve54nan91rc73bedsu0-a.oregon-postgres.render.com/backend_db_flask_user_vmia')
+db_url = os.environ.get('DATABASE_URL', 'postgresql://backend_db_flask_user_vmia_user:pVpy47XSEhOaro9AinYSzphKMumM8Aug@dpg-cve54nan91rc73bedsu0-a/backend_db_flask_user_vmia')
 
 # Setting up the database URI (PostgreSQL in production, SQLite for local testing)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
@@ -106,7 +106,7 @@ def add_task():
         data = request.get_json()
         logging.info(f"Received Task Data: {data}")  # Debugging
 
-        # Validate request data (Ensure user_id is included)
+        # Validate request data (Ensure user_id and task are included)
         if not data or 'task' not in data or 'user_id' not in data:
             logging.warning("Invalid task data received")
             return jsonify({'error': 'Invalid request data'}), 400
@@ -117,14 +117,28 @@ def add_task():
             logging.warning(f"User with ID {data['user_id']} not found")
             return jsonify({'error': 'User not found'}), 404
 
-    
+        # Initialize `new_task` properly
+        new_task = Task(
+            task=data['task'],
+            description=data.get('description', ''),
+            priority=data.get('priority', 'low'),
+            status=data.get('status', True),  
+            task_date=data.get('task_date', ''),
+            user_id=data['user_id']
+        )
+
+        # Commit task to the database
+        db.session.add(new_task)
+        db.session.commit()
+
         logging.info(f"Task '{new_task.task}' added for User {data['user_id']}")
         return jsonify({'message': 'Task added successfully', 'task_id': new_task.id}), 201
 
     except Exception as e:
         logging.error(f"Error adding task: {e}")
-        db.session.rollback()  # Prevent corruption on failure
+        db.session.rollback()  # Prevent database corruption
         return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
+
 
         # Create task
         new_task = Task(
