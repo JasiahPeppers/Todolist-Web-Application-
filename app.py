@@ -115,18 +115,14 @@ def get_users():
 
 @app.route('/tasks', methods=['POST'])
 def add_task():
-    """Add a new task with user ID validation."""
     try:
         data = request.get_json()
         logging.info(f"Received Task Data: {data}")
 
-        # Validate request data
-        if not data or 'task' not in data or 'user_id' not in data:
-            logging.warning("Invalid task data received")
-            return jsonify({'error': 'Invalid request data'}), 400
-        
-        # Ensure `user_id` is properly extracted and not None
+        # Ensure `user_id` is extracted correctly
         user_id = data.get('user_id')
+        logging.info(f"Extracted user_id: {user_id}")  # Debugging
+
         if user_id is None:
             logging.warning("User ID is missing or null")
             return jsonify({'error': 'User ID is required'}), 400
@@ -134,17 +130,17 @@ def add_task():
         # Check if the user exists
         user = User.query.get(user_id)
         if not user:
-            logging.warning(f"User ID {user_id} not found in the database")
+            logging.warning(f"User ID {user_id} not found in database")
             return jsonify({'error': 'User not found'}), 404
 
-        # Create and commit task
+        # Create and commit the task
         new_task = Task(
             task=data['task'],
             description=data.get('description', ''),
             priority=data.get('priority', 'low'),
-            status=data.get('status', True),  
+            status=data.get('status', True),
             task_date=data.get('task_date', ''),
-            user_id=user_id  # Ensure `user_id` is set correctly
+            user_id=user_id  # Ensure `user_id` is correctly set
         )
 
         db.session.add(new_task)
