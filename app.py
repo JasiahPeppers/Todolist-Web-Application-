@@ -10,7 +10,6 @@ app = Flask(__name__)
 # Allow all headers and requests
 CORS(app, supports_credentials=True, origins=["*"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
 
-
 # Set a secret key for session management (using the one you generated)
 app.secret_key = os.environ.get('SECRET_KEY', 'b07d3858c42f80893b1176555d8cb7b1b96c03949018bc724eca0afc9ce7456c')  # Replace with your actual secret key in production
 
@@ -101,6 +100,7 @@ def login():
     except Exception as e:
         logging.error(f"Error during login: {e}")
         return jsonify({'message': 'Internal server error'}), 500
+
 # TASKS ROUTES SECTION 
 # This should GET all tasks routes 
 @app.route('/tasks', methods=['GET'])
@@ -131,6 +131,7 @@ def update_task_order():
     except Exception as e:
         logging.error(f"Error updating task order: {e}")
         return jsonify({'message': 'Internal server error'}), 500
+
 # Delete a task
 @app.route('/tasks/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
@@ -163,19 +164,27 @@ def add_task():
     data = request.get_json()
     print("Received Data:", data)  # Debugging output
 
+    # Ensure the required fields are present in the request data
     if not data or 'task' not in data or 'user_id' not in data:
         return jsonify({'message': 'Invalid request data'}), 400
 
-    # Check if the user exists
+    # Check if the user exists using the user_id
     user = User.query.get(data['user_id'])
     print("User Exists:", user)  # Debugging output
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
-    new_task = Task(task=data['task'], description=data.get('description', ''),
-                    priority=data.get('priority', 'low'), status=True,
-                    task_date=data.get('task_date', ''), user_id=data['user_id'])
+    # Create a new task object
+    new_task = Task(
+        task=data['task'],
+        description=data.get('description', ''),
+        priority=data.get('priority', 'low'),
+        status=True,  # Assuming task is active by default
+        task_date=data.get('task_date', ''),
+        user_id=data['user_id']  # Assign the task to the user
+    )
 
+    # Add and commit the task to the database
     db.session.add(new_task)
     db.session.commit()
 
