@@ -100,6 +100,65 @@ def login():
     except Exception as e:
         logging.error(f"Error during login: {e}")
         return jsonify({'message': 'Internal server error'}), 500
+@app.route('/tasks', methods=['POST'])
+def add_task():
+    """Add a new task with proper validation."""
+    try:
+        data = request.get_json()
+        logging.info(f"Received Task Data: {data}")  # Debugging
+
+        # Validate request data (Ensure user_id is included)
+        if not data or 'task' not in data or 'user_id' not in data:
+            logging.warning("Invalid task data received")
+            return jsonify({'error': 'Invalid request data'}), 400
+
+        # Check if user exists
+        user = User.query.get(data['user_id'])
+        if not user:
+            logging.warning(f"User with ID {data['user_id']} not found")
+            return jsonify({'error': 'User not found'}), 404
+
+        # Create task
+        new_task = Task(
+            task=data['task'],
+            description=data.get('description', ''),
+            priority=data.get('priority', 'low'),
+            status=True,  
+            task_date=data.get('task_date', ''),
+            user_id=data['user_id']
+        )
+
+        db.session.add(new_task)
+        db.session.commit()
+
+        logging.info(f"Task '{new_task.task}' added for User {data['user_id']}")
+        return jsonify({'message': 'Task added successfully', 'task_id': new_task.id}), 201
+
+    except Exception as e:
+        logging.error(f"Error adding task: {e}")
+        db.session.rollback()  # Prevent corruption on failure
+        return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
+
+        # Create task
+        new_task = Task(
+            task=data['task'],
+            description=data.get('description', ''),
+            priority=data.get('priority', 'low'),
+            status=True,  
+            task_date=data.get('task_date', ''),
+            user_id=data['user_id']
+        )
+
+        db.session.add(new_task)
+        db.session.commit()
+
+        logging.info(f"Task '{new_task.task}' added for User {data['user_id']}")
+        return jsonify({'message': 'Task added successfully', 'task_id': new_task.id}), 201
+
+    except Exception as e:
+        logging.error(f"Error adding task: {e}")
+        db.session.rollback()  # Prevent corruption on failure
+        return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
 
 # Run the app with debug enabled
 if __name__ == '__main__':
