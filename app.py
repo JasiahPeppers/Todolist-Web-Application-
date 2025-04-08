@@ -103,6 +103,16 @@ def login():
 
 # TASKS ROUTES SECTION 
 # This should GET all tasks routes 
+@app.route('/users', methods=['GET'])
+def get_users():
+    try:
+        users = User.query.all()
+        user_list = [{'id': u.id, 'username': u.username} for u in users]
+        return jsonify(user_list), 200
+    except Exception as e:
+        logging.error(f"Error fetching users: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
+
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
     try:
