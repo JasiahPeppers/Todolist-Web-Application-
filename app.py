@@ -160,11 +160,14 @@ def update_task(task_id):
 @app.route('/tasks', methods=['POST'])
 def add_task():
     data = request.get_json()
+    print("Received Data:", data)  # Debugging output
+
     if not data or 'task' not in data or 'user_id' not in data:
         return jsonify({'message': 'Invalid request data'}), 400
-    
+
     # Check if the user exists
     user = User.query.get(data['user_id'])
+    print("User Exists:", user)  # Debugging output
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
@@ -175,7 +178,9 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
+    print("Task Added:", new_task)  # Debugging output
     return jsonify({'message': 'Task added successfully'}), 201
+
 
 # Run the app with debug enabled
 if __name__ == '__main__':
