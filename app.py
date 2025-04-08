@@ -115,42 +115,47 @@ def get_users():
 
 @app.route('/tasks', methods=['POST'])
 def add_task():
-    """Add a new task with proper validation."""
+    """Add a new task with user ID validation."""
     try:
         data = request.get_json()
-        logging.info(f"Received Task Data: {data}")  # Debugging
+        logging.info(f"Received Task Data: {data}")
 
-        # Validate request data (Ensure user_id and task are included)
+        # Validate request data
         if not data or 'task' not in data or 'user_id' not in data:
             logging.warning("Invalid task data received")
             return jsonify({'error': 'Invalid request data'}), 400
+        
+        # Ensure `user_id` is properly extracted and not None
+        user_id = data.get('user_id')
+        if user_id is None:
+            logging.warning("User ID is missing or null")
+            return jsonify({'error': 'User ID is required'}), 400
 
-        # Check if user exists
-        user = User.query.get(data['user_id'])
+        # Check if the user exists
+        user = User.query.get(user_id)
         if not user:
-            logging.warning(f"User with ID {data['user_id']} not found")
+            logging.warning(f"User ID {user_id} not found in the database")
             return jsonify({'error': 'User not found'}), 404
 
-        # Initialize `new_task` properly
+        # Create and commit task
         new_task = Task(
             task=data['task'],
             description=data.get('description', ''),
             priority=data.get('priority', 'low'),
             status=data.get('status', True),  
             task_date=data.get('task_date', ''),
-            user_id=data['user_id']
+            user_id=user_id  # Ensure `user_id` is set correctly
         )
 
-        # Commit task to the database
         db.session.add(new_task)
         db.session.commit()
 
-        logging.info(f"Task '{new_task.task}' added for User {data['user_id']}")
+        logging.info(f"Task '{new_task.task}' added successfully for User {user_id}")
         return jsonify({'message': 'Task added successfully', 'task_id': new_task.id}), 201
 
     except Exception as e:
         logging.error(f"Error adding task: {e}")
-        db.session.rollback()  # Prevent database corruption
+        db.session.rollback()
         return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
 
 
