@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, abort
+from flask import Flask, request, jsonify, session
 import os
 import logging
 from flask_cors import CORS
@@ -15,7 +15,6 @@ app.secret_key = os.environ.get('SECRET_KEY', 'b07d3858c42f80893b1176555d8cb7b1b
 
 # PostgreSQL URL for your Render database
 db_url = os.environ.get('DATABASE_URL', 'postgresql://backend_db_flask_user_vmia_user:pVpy47XSEhOaro9AinYSzphKMumM8Aug@dpg-cve54nan91rc73bedsu0-a.oregon-postgres.render.com/backend_db_flask_user_vmia')
-print("Database URL:", db_url)  # This will print the database URL to verify it's correct
 
 # Setting up the database URI (PostgreSQL in production, SQLite for local testing)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
@@ -118,19 +117,7 @@ def add_task():
             logging.warning(f"User with ID {data['user_id']} not found")
             return jsonify({'error': 'User not found'}), 404
 
-        # Create task
-        new_task = Task(
-            task=data['task'],
-            description=data.get('description', ''),
-            priority=data.get('priority', 'low'),
-            status=True,  
-            task_date=data.get('task_date', ''),
-            user_id=data['user_id']
-        )
-
-        db.session.add(new_task)
-        db.session.commit()
-
+    
         logging.info(f"Task '{new_task.task}' added for User {data['user_id']}")
         return jsonify({'message': 'Task added successfully', 'task_id': new_task.id}), 201
 
