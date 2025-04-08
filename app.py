@@ -179,6 +179,27 @@ def add_task():
         logging.error(f"Error adding task: {e}")
         db.session.rollback()  # Prevent corruption on failure
         return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    """Retrieve all tasks."""
+    try:
+        tasks = Task.query.all()
+        task_list = [{
+            'id': t.id,
+            'task': t.task,
+            'description': t.description,
+            'priority': t.priority if t.priority else 'low',
+            'status': t.status,
+            'task_date': t.task_date,
+            'user_id': t.user_id
+        } for t in tasks]
+
+        logging.info(f"Fetched {len(task_list)} tasks successfully")
+        return jsonify(task_list), 200  # Returns list of tasks in JSON format
+
+    except Exception as e:
+        logging.error(f"Error fetching tasks: {e}")
+        return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
 
 # Run the app with debug enabled
 if __name__ == '__main__':
