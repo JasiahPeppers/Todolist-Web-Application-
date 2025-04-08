@@ -100,6 +100,35 @@ def login():
     except Exception as e:
         logging.error(f"Error during login: {e}")
         return jsonify({'message': 'Internal server error'}), 500
+# Get all tasks route
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    try:
+        tasks = Task.query.all()
+        task_list = [{'id': t.id, 'task': t.task, 'description': t.description, 'priority': t.priority, 'status': t.status, 'task_date': t.task_date} for t in tasks]
+        return jsonify(task_list), 200
+    except Exception as e:
+        logging.error(f"Error fetching tasks: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
+
+@app.route('/updateOrder', methods=['POST'])
+def update_task_order():
+    try:
+        data = request.get_json()
+        if not data or 'newOrder' not in data:
+            return jsonify({'message': 'Invalid request data'}), 400
+
+        # Loop through the new task order and update each task position
+        for index, task_id in enumerate(data['newOrder']):
+            task = Task.query.get(task_id)
+            if task:
+                task.priority = index  # Assuming you want to store the order as priority level
+                db.session.commit()
+
+        return jsonify({'message': 'Task order updated successfully'}), 200
+    except Exception as e:
+        logging.error(f"Error updating task order: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
 
 # Run the app with debug enabled
 if __name__ == '__main__':
