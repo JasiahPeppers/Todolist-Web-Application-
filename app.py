@@ -14,7 +14,7 @@ CORS(app, supports_credentials=True, origins=["*"], methods=["GET", "POST", "PUT
 app.secret_key = os.environ.get('SECRET_KEY', 'b07d3858c42f80893b1176555d8cb7b1b96c03949018bc724eca0afc9ce7456c')  # Replace with your actual secret key in production
 
 # PostgreSQL URL for your Render database
-db_url = os.environ.get('DATABASE_URL', 'postgresql://backend_db_flask_user_vmia_user:pVpy47XSEhOaro9AinYSzphKMumM8Aug@dpg-cve54nan91rc73bedsu0-a.oregon-postgres.render.com/backend_db_flask_user_vmia')
+db_url = os.environ.get('DATABASE_URL', 'postgresql://backend_db_flask_user_vmia_user:pVpy47XSEhOaro9AinYSzphKMumM8Aug@dpg-cve54nan91rc73bedsu0-a/backend_db_flask_user_vmia')
 print("Database URL:", db_url)  # This will print the database URL to verify it's correct
 
 # Setting up the database URI (PostgreSQL in production, SQLite for local testing)
