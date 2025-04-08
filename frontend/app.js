@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const taskList = document.getElementById("taskList");
 
     function fetchTasks() {
-        fetch('https://todolistalt.onrender.com/tasks')
+        fetch('https://todolistusers.onrender.com/tasks')
             .then(response => response.json())
             .then(tasks => {
                 tasks.forEach(task => {
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 priority: 'low' // Default priority
             };
 
-            fetch('https://todolistalt.onrender.com/tasks', {
+            fetch('https://todolistusers.onrender.com/tasks', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const deleteButton = listItem.querySelector('.delete-btn');
         deleteButton.addEventListener('click', function() {
-            fetch(`https://todolistalt.onrender.com/tasks/${task.id}`, {
+            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
                 method: 'DELETE'
             })
             .then(() => {
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
             completeButton.style.display = 'none';
             incompleteButton.style.display = 'inline-block';
 
-            fetch(`https://todolistalt.onrender.com/tasks/${task.id}`, {
+            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
             completeButton.style.display = 'inline-block';
             incompleteButton.style.display = 'none';
 
-            fetch(`https://todolistalt.onrender.com/tasks/${task.id}`, {
+            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 priorityDropdown.style.display = 'none';
 
                 // Update the task's priority on the server
-                fetch(`https://todolistalt.onrender.com/tasks/${task.id}`, {
+                fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -249,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const updatedDesc = textarea.value.trim();
                     task.description = updatedDesc;
 
-                    fetch(`https://todolistalt.onrender.com/tasks/${task.id}`, {
+                    fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -313,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
             newOrder: [...taskList.children].map(item => item.dataset.id)
         };
 
-        fetch('https://todolistalt.onrender.com/updateOrder', {
+        fetch('https://todolistusers.onrender.com/updateOrder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
