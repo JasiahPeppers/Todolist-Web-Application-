@@ -141,7 +141,6 @@ def delete_task(task_id):
     db.session.commit()
     return jsonify({'message': 'Task deleted successfully'}), 200
 
-# Update a task
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
     task = Task.query.get(task_id)
@@ -153,12 +152,22 @@ def update_task(task_id):
     task.description = data.get('description', task.description)
     task.priority = data.get('priority', task.priority)
     task.status = data.get('status', task.status)
+
+    db.session.commit()  # <-- This needs to be inside the function
+
+    return jsonify({'message': 'Task updated successfully'}), 200
+
 @app.route('/tasks', methods=['POST'])
 def add_task():
     data = request.get_json()
     if not data or 'task' not in data or 'user_id' not in data:
         return jsonify({'message': 'Invalid request data'}), 400
     
+    # Check if the user exists
+    user = User.query.get(data['user_id'])
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
     new_task = Task(task=data['task'], description=data.get('description', ''),
                     priority=data.get('priority', 'low'), status=True,
                     task_date=data.get('task_date', ''), user_id=data['user_id'])
@@ -168,8 +177,6 @@ def add_task():
 
     return jsonify({'message': 'Task added successfully'}), 201
 
-    db.session.commit()
-    return jsonify({'message': 'Task updated successfully'}), 200
 # Run the app with debug enabled
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
