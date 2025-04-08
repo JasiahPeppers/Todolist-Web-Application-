@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .catch(error => {
                 console.error('Error fetching tasks:', error);
-                alert('Failed to fetch tasks. Please try again later.');
+                alert('Sorry it is still not fecthing tasks :/.');
             });
     }
 
