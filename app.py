@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 # CORS Configuration
 # Allow all headers and requests
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["*"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
 
 
 # Set a secret key for session management (using the one you generated)
