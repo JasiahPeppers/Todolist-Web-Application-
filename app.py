@@ -143,15 +143,23 @@ def add_task():
             return jsonify({'message': 'User not found'}), 404
         
         data = request.get_json()
-        if not data or 'task' not in data:
-            return jsonify({'message': 'Invalid request data'}), 400
+        if not data or 'task' not in data or 'task_date' not in data:
+            return jsonify({'message': 'Invalid request data, task and task_date are required'}), 400
+
+        task_date = data['task_date']
+        
+        # Ensure task_date is in a valid format (simple validation)
+        try:
+            datetime.strptime(task_date, '%Y-%m-%d')  # Adjust format if necessary
+        except ValueError:
+            return jsonify({'message': 'Invalid task_date format. Use YYYY-MM-DD'}), 400
 
         task = Task(
             task=data['task'],
             description=data.get('description', ''),
             priority=data.get('priority', 'low'),
             status=True,
-            task_date=data['task_date'],
+            task_date=task_date,
             user_id=user.id  # Associate task with logged-in user
         )
         db.session.add(task)
