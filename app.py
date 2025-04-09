@@ -102,3 +102,63 @@ def login():
 # Run the app with debug enabled
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+## THIS IS WHERE THE TASK ROUTES ARE LOCATED 
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    try:
+        username = session.get('username')
+        if not username:
+            return jsonify({'message': 'You must be logged in to fetch tasks'}), 403
+
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+
+        tasks = Task.query.filter_by(user_id=user.id).all()
+        tasks_data = [{
+            'id': task.id,
+            'task': task.task,
+            'description': task.description,
+            'priority': task.priority,
+            'status': task.status,
+            'task_date': task.task_date
+        } for task in tasks]
+
+        return jsonify(tasks_data), 200
+    except Exception as e:
+        logging.error(f"Error fetching tasks: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
+
+
+# Add a new task
+@app.route('/tasks', methods=['POST'])
+def add_task():
+    try:
+        data = request.get_json()
+        if not data or 'task' not in data or 'user_id' not in data:
+            return jsonify({'message': 'Invalid request data'}), 400
+
+        task = Task(
+            task=data['task'],
+            description=data.get('description', ''),
+            priority=data.get('priority', 'low'),
+            status=True,
+            task_date=data['task_date'],
+            user_id=data['user_id']
+        )
+        
+        db.session.add(task)
+        db.session.commit()
+
+        return jsonify({
+            'id': task.id,
+            'task': task.task,
+            'description': task.description,
+            'priority': task.priority,
+            'status': task.status,
+            'task_date': task.task_date
+        }), 201
+    except Exception as e:
+        logging.error(f"Error adding task: {e}")
+        db.session.rollback()
+        return jsonify({'message': 'Internal server error'}), 500
