@@ -30,44 +30,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fetchTasks();
 
-   addButton.addEventListener("click", () => {
+  addButton.addEventListener("click", () => {
     const taskValue = taskInput.value.trim();
     const descValue = descInput.value.trim();
-    const user_id = sessionStorage.getItem('user_id'); // Retrieve logged-in user ID
+    
+    if (!taskValue) return; // Ensure task value is not empty
 
-    if (!user_id) {
-        alert("You must be logged in to add a task.");
-        return; // Stop the function if user_id is missing
-    }
+    const task = {
+        task: taskValue,
+        description: descValue,
+        task_date: today.toISOString().split('T')[0],
+        priority: 'low' // Default priority
+    };
 
-    if (taskValue) {
-        const task = {
-            task: taskValue,
-            description: descValue,
-            task_date: today.toISOString().split('T')[0],
-            priority: 'low', // Fixed missing comma
-            user_id: user_id // Dynamically set for the logged-in user
-        };
-
-        fetch('https://todolistusers.onrender.com/tasks', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(task)
-        })
-        .then(response => response.json())
-        .then(newTask => {
-            addTaskToList(newTask);
-            taskInput.value = '';
-            descInput.value = '';
-            sortTasks(); // Sort after adding a task
-        })
-        .catch(error => {
-            console.error('Error adding task:', error);
-            alert('Failed to add task. Please try again later.');
-        });
-    }
+    fetch('https://todolistusers.onrender.com/tasks', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(task)
+    })
+    .then(response => response.json())
+    .then(newTask => {
+        addTaskToList(newTask);
+        taskInput.value = '';
+        descInput.value = '';
+        sortTasks(); // Sort after adding a task
+    })
+    .catch(error => {
+        console.error('Error adding task:', error);
+        alert('Failed to add task. Please try again later.');
+    });
+});
 });
 
 
