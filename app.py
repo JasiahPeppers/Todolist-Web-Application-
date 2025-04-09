@@ -103,6 +103,7 @@ def login():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
 ## THIS IS WHERE THE TASK ROUTES ARE LOCATED 
+# GET /tasks route
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
     try:
@@ -115,6 +116,11 @@ def get_tasks():
             return jsonify({'message': 'User not found'}), 404
 
         tasks = Task.query.filter_by(user_id=user.id).all()
+        
+        # Debugging: Check if the tasks list is populated
+        if not tasks:
+            logging.info(f"No tasks found for user '{username}'")
+        
         tasks_data = [{
             'id': task.id,
             'task': task.task,
@@ -129,8 +135,7 @@ def get_tasks():
         logging.error(f"Error fetching tasks: {e}")
         return jsonify({'message': 'Internal server error'}), 500
 
-
-# Add a new task
+# POST /tasks route (adding a new task)
 @app.route('/tasks', methods=['POST'])
 def add_task():
     try:
@@ -162,6 +167,10 @@ def add_task():
             task_date=task_date,
             user_id=user.id  # Associate task with logged-in user
         )
+        
+        # Debugging: Output the task being added
+        print(f"Adding task: {task.task} for user_id {user.id}")
+
         db.session.add(task)
         db.session.commit()
 
@@ -177,3 +186,7 @@ def add_task():
         logging.error(f"Error adding task: {e}")
         db.session.rollback()
         return jsonify({'message': 'Internal server error'}), 500
+
+# Run the app with debug enabled
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
