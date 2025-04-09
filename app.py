@@ -134,8 +134,16 @@ def get_tasks():
 @app.route('/tasks', methods=['POST'])
 def add_task():
     try:
+        username = session.get('username')
+        if not username:
+            return jsonify({'message': 'You must be logged in to add a task'}), 403
+        
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+        
         data = request.get_json()
-        if not data or 'task' not in data or 'user_id' not in data:
+        if not data or 'task' not in data:
             return jsonify({'message': 'Invalid request data'}), 400
 
         task = Task(
@@ -144,9 +152,8 @@ def add_task():
             priority=data.get('priority', 'low'),
             status=True,
             task_date=data['task_date'],
-            user_id=data['user_id']
+            user_id=user.id  # Associate task with logged-in user
         )
-        
         db.session.add(task)
         db.session.commit()
 
