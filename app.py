@@ -4,6 +4,7 @@ import logging
 from flask_cors import CORS
 from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime  # <-- Import datetime module here
 
 app = Flask(__name__)
 CORS(app)
