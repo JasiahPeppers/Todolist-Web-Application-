@@ -24,10 +24,13 @@ class Task(db.Model):
     description = db.Column(db.String(255), nullable=True)
     priority = db.Column(db.String(50), nullable=True)
     status = db.Column(db.Boolean, default=True)
-    task_date = db.Column(db.String(20), nullable=True)
+    task_date = db.Column(db.Date, nullable=True)  # Change to db.Date
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
+    
     def __init__(self, task, description, priority, status, task_date, user_id):
         self.task = task
         self.description = description
         self.priority = priority
+        self.status = status
+        self.task_date = task_date
+        self.user_id = user_id  # Make sure to assign user_id here
