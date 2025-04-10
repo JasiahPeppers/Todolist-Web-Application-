@@ -130,6 +130,7 @@ def get_tasks():
             'priority': task.priority,
             'status': task.status,
             'task_date': task.task_date
+            'user_id': task.user_id  
         } for task in tasks]
 
         return jsonify(tasks_data), 200
@@ -190,6 +191,7 @@ def add_task():
         logging.error(f"Error adding task: {e}")
         db.session.rollback()
         return jsonify({'message': 'Internal server error'}), 500
+        
 @app.route('/users', methods=['GET'])
 def get_users():
     try:
@@ -205,6 +207,7 @@ def get_users():
     except Exception as e:
         logging.error(f"Error fetching users: {e}")
         return jsonify({'message': 'Internal server error'}), 500
+        
 @app.route('/tasks/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     try:
@@ -232,6 +235,7 @@ def delete_task(task_id):
         logging.error(f"Error deleting task: {e}")
         db.session.rollback()
         return jsonify({'message': 'Internal server error'}), 500
+        
  # PUT /tasks/<task_id> route (updating a task)
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
