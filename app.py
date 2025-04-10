@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, session, abort
 import os
+from flask_migrate import Migrate
 import logging
 from flask_cors import CORS
 from extensions import db  # Import db from extensions.py
