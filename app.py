@@ -148,6 +148,8 @@ def add_task():
         if not user:
             return jsonify({'message': 'User not found'}), 404
         
+        logging.info(f"Logged-in user: {user.username}, user_id: {user.id}")
+
         data = request.get_json()
         if not data or 'task' not in data or 'task_date' not in data:
             return jsonify({'message': 'Invalid request data, task and task_date are required'}), 400
@@ -166,11 +168,11 @@ def add_task():
             priority=data.get('priority', 'low'),
             status=True,
             task_date=task_date,
-            user_id=user.id  # Associate task with logged-in user
+            user_id=user.id  # Ensure this is not None
         )
         
         # Debugging: Output the task being added
-        print(f"Adding task: {task.task} for user_id {user.id}")
+        logging.info(f"Adding task: {task.task} for user_id {user.id}")
 
         db.session.add(task)
         db.session.commit()
@@ -187,6 +189,7 @@ def add_task():
         logging.error(f"Error adding task: {e}")
         db.session.rollback()
         return jsonify({'message': 'Internal server error'}), 500
+
 
 # Run the app with debug enabled
 if __name__ == '__main__':
