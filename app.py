@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime  # <-- Import datetime module here
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 # Set a secret key for session management (using the one you generated)
 app.secret_key = os.environ.get('SECRET_KEY', 'b07d3858c42f80893b1176555d8cb7b1b96c03949018bc724eca0afc9ce7456c')  # Replace with your actual secret key in production
