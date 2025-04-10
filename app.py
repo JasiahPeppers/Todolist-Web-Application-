@@ -129,8 +129,8 @@ def get_tasks():
             'description': task.description,
             'priority': task.priority,
             'status': task.status,
-            'task_date': task.task_date
-            'user_id': task.user_id  
+            'task_date': task.task_date,
+            'user_id': task.user_id 
         } for task in tasks]
 
         return jsonify(tasks_data), 200
