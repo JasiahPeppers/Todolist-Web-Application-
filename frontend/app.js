@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function fetchTasks() {
         fetch('https://todolistusers.onrender.com/tasks')
+        credentials: 'include'
             .then(response => response.json())
             .then(tasks => {
                 tasks.forEach(task => {
