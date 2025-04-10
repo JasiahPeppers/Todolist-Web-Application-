@@ -205,6 +205,79 @@ def get_users():
     except Exception as e:
         logging.error(f"Error fetching users: {e}")
         return jsonify({'message': 'Internal server error'}), 500
+@app.route('/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    try:
+        username = session.get('username')
+        if not username:
+            return jsonify({'message': 'You must be logged in to delete a task'}), 403
+        
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+        
+        task = Task.query.get(task_id)
+        if not task:
+            return jsonify({'message': 'Task not found'}), 404
+        
+        if task.user_id != user.id:
+            return jsonify({'message': 'Unauthorized'}), 403
+        
+        db.session.delete(task)
+        db.session.commit()
+        
+        return jsonify({'message': 'Task deleted successfully'}), 200
+
+    except Exception as e:
+        logging.error(f"Error deleting task: {e}")
+        db.session.rollback()
+        return jsonify({'message': 'Internal server error'}), 500
+ # PUT /tasks/<task_id> route (updating a task)
+@app.route('/tasks/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+    try:
+        username = session.get('username')
+        if not username:
+            return jsonify({'message': 'You must be logged in to update a task'}), 403
+        
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+        
+        task = Task.query.get(task_id)
+        if not task:
+            return jsonify({'message': 'Task not found'}), 404
+        
+        if task.user_id != user.id:
+            return jsonify({'message': 'Unauthorized'}), 403
+        
+        data = request.get_json()
+        
+        if 'status' in data:
+            task.status = data['status']
+        
+        if 'priority' in data:
+            task.priority = data['priority']
+        
+        if 'description' in data:
+            task.description = data['description']
+        
+        db.session.commit()
+
+        return jsonify({
+            'id': task.id,
+            'task': task.task,
+            'description': task.description,
+            'priority': task.priority,
+            'status': task.status,
+            'task_date': task.task_date
+        }), 200
+
+    except Exception as e:
+        logging.error(f"Error updating task: {e}")
+        db.session.rollback()
+        return jsonify({'message': 'Internal server error'}), 500
+       
 
 # Run the app with debug enabled
 if __name__ == '__main__':
