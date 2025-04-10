@@ -190,7 +190,21 @@ def add_task():
         logging.error(f"Error adding task: {e}")
         db.session.rollback()
         return jsonify({'message': 'Internal server error'}), 500
+@app.route('/users', methods=['GET'])
+def get_users():
+    try:
+        users = User.query.all()  # Query to fetch all users from the User table
+        
+        # Create a list of dictionaries to return only the required data (username and id)
+        users_data = [{
+            'id': user.id,
+            'username': user.username
+        } for user in users]
 
+        return jsonify(users_data), 200
+    except Exception as e:
+        logging.error(f"Error fetching users: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
 
 # Run the app with debug enabled
 if __name__ == '__main__':
