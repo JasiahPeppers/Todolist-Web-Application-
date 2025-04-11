@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="task-title">
                     <span class="task-number"></span> ${task.task || 'No Task Name'}
                 </span>
-                <span class="desc">${task.description || 'No Description'}</span>
+                <span class="desc">${task.description || ''}</span>
             </div>
             <div class="action-buttons" style="display:none;">
                 <button class="delete-btn">Delete</button>
