@@ -89,6 +89,7 @@ def login():
             logging.info(f"User '{username}' found, checking password...")
             if user.check_password(password):
                 session['username'] = username
+                session['user_id'] = user.id
                 logging.info(f"User '{username}' logged in successfully")
                 return jsonify({'message': 'Logged in successfully', 'user_id': user.id}), 200
             else:
