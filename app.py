@@ -296,8 +296,8 @@ def update_task(task_id):
         db.session.rollback()
         return jsonify({'message': 'Internal server error'}), 500
          
-         @app.route('/updateOrder', methods=['PUT'])
-         @cross_origin(origins=["https://todolistapp.infy.uk"], supports_credentials=True
+@app.route('/updateOrder', methods=['PUT'])
+@cross_origin(origins=["https://todolistapp.infy.uk"], supports_credentials=True
 def update_order():
     # Your code to handle updating the order
     return jsonify({'message': 'Order updated successfully'}), 200
