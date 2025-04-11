@@ -45,12 +45,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const task = {
                 task: taskValue,
                 description: descValue,
+                task_date: today.tolue,
                 task_date: today.toISOString().split('T')[0],
                 priority: 'low' // Default priority
             };
 
             fetch('https://todolistusers.onrender.com/tasks', {  // Updated URL
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -77,12 +79,13 @@ document.addEventListener("DOMContentLoaded", () => {
         listItem.classList.add(`${priority}-priority`);
         listItem.dataset.priority = priority; // Store the priority in data attribute
         listItem.dataset.id = task.id; // Store task ID to link to backend
+
         listItem.innerHTML = `
             <div class="task-wrapper">
                 <span class="task-title">
-                    <span class="task-number"></span> ${task.task}
+                    <span class="task-number"></span> ${task.task || 'No Task Name'}
                 </span>
-                <span class="desc">${task.description}</span>
+                <span class="desc">${task.description || 'No Description'}</span>
             </div>
             <div class="action-buttons" style="display:none;">
                 <button class="delete-btn">Delete</button>
