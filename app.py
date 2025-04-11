@@ -8,6 +8,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime  # <-- Import datetime module here
 
 app = Flask(__name__)
+
+# Add these two lines to your Flask config
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Allow cross-origin requests
+app.config['SESSION_COOKIE_SECURE'] = True       # Ensure cookies are sent over HTTPS
+
+
 CORS(app, origins=["https://todolistapp.infy.uk"], supports_credentials=True)
 
 # Set a secret key for session management (using the one you generated)
