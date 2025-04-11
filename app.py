@@ -7,6 +7,7 @@ from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime  # <-- Import datetime module here
 from flask_session import Session
+from flask_cors import cross_origin
 
 
 app = Flask(__name__)
@@ -294,6 +295,13 @@ def update_task(task_id):
         logging.error(f"Error updating task: {e}")
         db.session.rollback()
         return jsonify({'message': 'Internal server error'}), 500
+         
+         @app.route('/updateOrder', methods=['PUT'])
+         @cross_origin(origins=["https://todolistapp.infy.uk"], supports_credentials=True
+def update_order():
+    # Your code to handle updating the order
+    return jsonify({'message': 'Order updated successfully'}), 200
+
        
 
 # Run the app with debug enabled
