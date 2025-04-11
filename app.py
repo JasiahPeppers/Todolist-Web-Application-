@@ -16,7 +16,11 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Allow cross-origin requests
 app.config['SESSION_COOKIE_SECURE'] = True       # Ensure cookies are sent over HTTPS
 
 
-CORS(app, origins=["https://todolistapp.infy.uk"], supports_credentials=True)
+CORS(app, 
+     origins=["https://todolistapp.infy.uk"], 
+     supports_credentials=True, 
+     allow_headers=["Content-Type", "Authorization"])
+
 
 # Set a secret key for session management (using the one you generated)
 app.secret_key = os.environ.get('SECRET_KEY', 'b07d3858c42f80893b1176555d8cb7b1b96c03949018bc724eca0afc9ce7456c')  # Replace with your actual secret key in production
