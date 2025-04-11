@@ -13,64 +13,69 @@ document.addEventListener("DOMContentLoaded", () => {
     const addButton = document.getElementById("addButton");
     const taskList = document.getElementById("taskList");
 
+    // Fetch tasks and check if it's an array before processing
     function fetchTasks() {
-        fetch('https://todolistusers.onrender.com/tasks')
-        credentials: 'include'
-            .then(response => response.json())
-            .then(tasks => {
-                tasks.forEach(task => {
-                    addTaskToList(task);
-                });
-                sortTasks(); // Sort tasks on load
-            })
-            .catch(error => {
-                console.error('Error fetching tasks:', error);
-                alert('Sorry it is still not fecthing tasks :/.');
-            });
-    }
-
-    fetchTasks();
-
-  addButton.addEventListener("click", () => {
-    const taskValue = taskInput.value.trim();
-    const descValue = descInput.value.trim();
-    
-    if (!taskValue) return; // Ensure task value is not empty
-
-    const task = {
-        task: taskValue,
-        description: descValue,
-        task_date: today.toISOString().split('T')[0],
-        priority: 'low' // Default priority
-    };
-
     fetch('https://todolistusers.onrender.com/tasks', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(task)
+        method: 'GET',
+        credentials: 'include' // This sends cookies like the session
     })
     .then(response => response.json())
-    .then(newTask => {
-        addTaskToList(newTask);
-        taskInput.value = '';
-        descInput.value = '';
-        sortTasks(); // Sort after adding a task
+    .then(tasks => {
+        if (Array.isArray(tasks)) {
+            tasks.forEach(task => {
+                addTaskToList(task);
+            });
+            sortTasks(); // Sort tasks on load
+        } else {
+            console.error('Expected an array of tasks, but got:', tasks);
+        }
     })
     .catch(error => {
-        console.error('Error adding task:', error);
-        alert('Failed to add task. Please try again later.');
+        console.error('Error fetching tasks:', error);
+        alert('Failed to fetch tasks. Please try again later.');
     });
-});
-});
+}
+    fetchTasks();
 
+    addButton.addEventListener("click", () => {
+        const taskValue = taskInput.value.trim();
+        const descValue = descInput.value.trim();
+
+        if (taskValue) {
+            const task = {
+                task: taskValue,
+                description: descValue,
+                task_date: today.toISOString().split('T')[0],
+                priority: 'low' // Default priority
+            };
+
+            fetch('https://todolistusers.onrender.com/tasks', {  // Updated URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(task)
+            })
+            .then(response => response.json())
+            .then(newTask => {
+                addTaskToList(newTask);
+                taskInput.value = '';
+                descInput.value = '';
+                sortTasks(); // Sort after adding a task
+            })
+            .catch(error => {
+                console.error('Error adding task:', error);
+                alert('Failed to add task. Please try again later.');
+            });
+        }
+    });
 
     function addTaskToList(task) {
+        const priority = task.priority || 'low'; // Default to 'low' if priority is undefined
         const listItem = document.createElement("li");
         listItem.draggable = true;
-        listItem.classList.add(`${task.priority}-priority`);
-        listItem.dataset.priority = task.priority; // Store the priority in data attribute
+        listItem.classList.add(`${priority}-priority`);
+        listItem.dataset.priority = priority; // Store the priority in data attribute
         listItem.dataset.id = task.id; // Store task ID to link to backend
         listItem.innerHTML = `
             <div class="task-wrapper">
@@ -83,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button class="delete-btn">Delete</button>
                 <button class="complete-btn">Complete</button>
                 <button class="incomplete-btn" style="display: none;">Incomplete</button>
-                <button class="priority-btn">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} <span class="dropdown-arrow">▼</span></button>
+                <button class="priority-btn">${priority.charAt(0).toUpperCase() + priority.slice(1)} <span class="dropdown-arrow">▼</span></button>
                 <div class="priority-dropdown" style="display: none;">
                     <button class="priority-option" data-priority="low">Low</button>
                     <button class="priority-option" data-priority="medium">Medium</button>
@@ -93,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         // Initial priority color update
-        updatePriorityColor(listItem, task.priority);
+        updatePriorityColor(listItem, priority);
 
         taskList.appendChild(listItem);
 
@@ -133,8 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const deleteButton = listItem.querySelector('.delete-btn');
         deleteButton.addEventListener('click', function() {
-            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
-                method: 'DELETE'
+            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {  // Updated URL
+                method: 'DELETE',
+                credentials: 'include',
             })
             .then(() => {
                 taskList.removeChild(listItem);
@@ -153,8 +159,9 @@ document.addEventListener("DOMContentLoaded", () => {
             completeButton.style.display = 'none';
             incompleteButton.style.display = 'inline-block';
 
-            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
+            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {  // Updated URL
                 method: 'PUT',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -172,8 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
             completeButton.style.display = 'inline-block';
             incompleteButton.style.display = 'none';
 
-            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
+            fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {  // Updated URL
                 method: 'PUT',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -204,8 +212,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 priorityDropdown.style.display = 'none';
 
                 // Update the task's priority on the server
-                fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
+                fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {  // Updated URL
                     method: 'PUT',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -252,8 +261,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     const updatedDesc = textarea.value.trim();
                     task.description = updatedDesc;
 
-                    fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {
+                    fetch(`https://todolistusers.onrender.com/tasks/${task.id}`, {  // Updated URL
                         method: 'PUT',
+                        credentials: 'include',
                         headers: {
                             'Content-Type': 'application/json'
                         },
@@ -316,8 +326,9 @@ document.addEventListener("DOMContentLoaded", () => {
             newOrder: [...taskList.children].map(item => item.dataset.id)
         };
 
-        fetch('https://todolistusers.onrender.com/updateOrder', {
+        fetch('https://todolistusers.onrender.com/updateOrder', {  // Updated URL
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
