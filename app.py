@@ -90,7 +90,7 @@ def login():
             if user.check_password(password):
                 session['username'] = username
                 logging.info(f"User '{username}' logged in successfully")
-                return jsonify({'message': 'Logged in successfully'}), 200
+                return jsonify({'message': 'Logged in successfully', 'user_id': user.id}), 200
             else:
                 logging.warning(f"Incorrect password for '{username}'")
                 return jsonify({'message': 'Invalid username or password'}), 401
