@@ -6,6 +6,8 @@ from flask_cors import CORS
 from extensions import db  # Import db from extensions.py
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime  # <-- Import datetime module here
+from flask_session import Session
+
 
 app = Flask(__name__)
 
